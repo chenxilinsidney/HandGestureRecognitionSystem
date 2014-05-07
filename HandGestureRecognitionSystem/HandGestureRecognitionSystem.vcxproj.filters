@@ -16,10 +16,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
-    <None Include="res\HandGestureRecognitionSystem.rc2">
+    <None Include="res\HandGestureRecognitionSystem.ico">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\HandGestureRecognitionSystem.ico">
+    <None Include="res\HandGestureRecognitionSystem.rc2">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
@@ -36,13 +36,13 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CvvImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Header.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
