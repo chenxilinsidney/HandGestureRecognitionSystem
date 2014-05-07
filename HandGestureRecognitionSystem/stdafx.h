@@ -55,3 +55,15 @@
 #endif
 
 
+// OPENCV LIBRAY
+#include "opencv2/core/core.hpp";
+#include "opencv2/highgui/highgui.hpp";
+#include "opencv2/imgproc/imgproc.hpp";
+using namespace cv;
+
+// CvvImage for Show image to Picture DC
+#include "CvvImage.h"
+
+// test for show
+#include <iostream>
+using namespace std;

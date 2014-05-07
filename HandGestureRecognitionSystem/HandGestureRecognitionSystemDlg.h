@@ -2,9 +2,6 @@
 // HandGestureRecognitionSystemDlg.h : header file
 //
 
-#pragma once
-
-
 // CHandGestureRecognitionSystemDlg dialog
 class CHandGestureRecognitionSystemDlg : public CDialogEx
 {
@@ -29,4 +26,13 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+    afx_msg void OnClickedButtonreadimage();
+    afx_msg void OnClickedButtonprocessimage();
+private:
+    Mat image_src;
+    Mat image_dst;
+    int image_height;
+    int image_width;
+    int image_interval;
 };
