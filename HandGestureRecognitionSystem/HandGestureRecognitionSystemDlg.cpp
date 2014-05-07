@@ -7,10 +7,8 @@
 #include "HandGestureRecognitionSystemDlg.h"
 #include "afxdialogex.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
-
+// Numeric constants
+const short ID_TIMER = 1;
 
 // CAboutDlg dialog used for App About
 
@@ -55,8 +53,9 @@ CHandGestureRecognitionSystemDlg::CHandGestureRecognitionSystemDlg(CWnd* pParent
     , image_interval(20)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
-    image_src = NULL;
-    image_dst = NULL;
+    videocapture = VideoCapture(0);
+    image_src = Mat(image_height, image_width, CV_8UC3);
+    image_dst = Mat(image_height, image_width, CV_8UC3);
 }
 
 void CHandGestureRecognitionSystemDlg::DoDataExchange(CDataExchange* pDX)
@@ -68,8 +67,9 @@ BEGIN_MESSAGE_MAP(CHandGestureRecognitionSystemDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-    ON_BN_CLICKED(IDC_BUTTONREADIMAGE, &CHandGestureRecognitionSystemDlg::OnClickedButtonreadimage)
-    ON_BN_CLICKED(IDC_BUTTONPROCESSIMAGE, &CHandGestureRecognitionSystemDlg::OnClickedButtonprocessimage)
+    ON_BN_CLICKED(IDC_BUTTONREADIMAGE, &CHandGestureRecognitionSystemDlg::OnClickedButtonPlayCamera)
+    ON_BN_CLICKED(IDC_BUTTONPROCESSIMAGE, &CHandGestureRecognitionSystemDlg::OnClickedButtonStopCamera)
+    ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 
@@ -170,14 +170,24 @@ void CHandGestureRecognitionSystemDlg::OnPaint()
         image_interval * 2 + image_height,
         image_interval * 4,
         image_interval);
-    GetDlgItem(IDOK)->MoveWindow(image_interval * 12,
+    GetDlgItem(IDC_STATIC)->MoveWindow(image_interval * 12,
         image_interval * 2 + image_height,
-        image_interval * 4,
+        image_interval * 8,
         image_interval);
-    GetDlgItem(IDCANCEL)->MoveWindow(image_interval * 18,
+    CFont testfont;
+    testfont.CreatePointFont(125, "微软雅黑");
+    GetDlgItem(IDC_STATIC)->SetFont(&testfont);
+    GetDlgItem(IDOK)->MoveWindow(image_width * 2 - image_interval * 3,
         image_interval * 2 + image_height,
-        image_interval * 4,
+        image_interval * 2,
         image_interval);
+    GetDlgItem(IDCANCEL)->MoveWindow(image_width * 2,
+        image_interval * 2 + image_height,
+        image_interval * 2,
+        image_interval);
+    // set rect
+    GetDlgItem(IDC_IMAGESRC)->GetClientRect(&rect_image_src);
+    GetDlgItem(IDC_IMAGEDST)->GetClientRect(&rect_image_dst);
 }
 
 // The system calls this function to obtain the cursor to display while the user drags
@@ -189,51 +199,103 @@ HCURSOR CHandGestureRecognitionSystemDlg::OnQueryDragIcon()
 
 
 
-void CHandGestureRecognitionSystemDlg::OnClickedButtonreadimage()
+void CHandGestureRecognitionSystemDlg::OnClickedButtonPlayCamera()
 {
     // TODO: Add your control notification handler code here
-    // read image
-    image_src = imread("lena.bmp");
-    if (image_src.data == NULL)
+    if(!GetImageSrc()) {
+        AfxMessageBox("CAN NOT FIND CAMERA DEVICE!");
         return;
-    resize(image_src, image_src, Size(image_width, image_height));
+    }
+    ProcessImage();
+    PlayImageSrc();
+    PlayImageDst();
+    StartTimer();
+}
+
+
+void CHandGestureRecognitionSystemDlg::OnClickedButtonStopCamera()
+{
+    // TODO: Add your control notification handler code here
+    StopTimer();
+}
+
+
+void CHandGestureRecognitionSystemDlg::OnTimer(UINT_PTR nIDEvent)
+{
+    // TODO: Add your message handler code here and/or call default
+    if(!GetImageSrc()) {
+        AfxMessageBox("CAN NOT FIND CAMERA DEVICE!");
+        return;
+    }
+    ProcessImage();
+    PlayImageSrc();
+    PlayImageDst();
+    CDialogEx::OnTimer(nIDEvent);
+}
+
+// CHandGestureRecognitionSystemDlg::StartTimer - Start the timer.
+
+void CHandGestureRecognitionSystemDlg::StartTimer(void)
+{
+    // timer
+    SetTimer(ID_TIMER, 30, NULL);
+}
+
+// CHandGestureRecognitionSystemDlg::StopTimer - Stop the timer.
+
+void CHandGestureRecognitionSystemDlg::StopTimer(void)
+{
+    // kill timer
+    KillTimer(ID_TIMER);
+}
+
+
+void CHandGestureRecognitionSystemDlg::PlayImageSrc(void)
+{
     // get HDC
     CDC* pDC = GetDlgItem(IDC_IMAGESRC)->GetDC(); // 获得显示控件的 DC
     HDC hDC = pDC ->GetSafeHdc();                 // 获取HDC(设备句柄)进行绘图操作
-    // get rect
-    CRect rect;
-    GetDlgItem(IDC_IMAGESRC)->GetClientRect(&rect);
     // MAT TO IplImage
     IplImage img = IplImage(image_src);
     // IplImage TO CvvImage
     CvvImage cimg;
     cimg.CopyOf(&img);                          // 复制图片
-    cimg.DrawToHDC(hDC, &rect);                 // 将图片绘制到显示控件的指定区域
+    cimg.DrawToHDC(hDC, &rect_image_src);       // 将图片绘制到显示控件的指定区域
     // release CDC
-    ReleaseDC( pDC );
+    ReleaseDC(pDC);
 }
 
 
-void CHandGestureRecognitionSystemDlg::OnClickedButtonprocessimage()
+void CHandGestureRecognitionSystemDlg::PlayImageDst(void)
 {
-    // TODO: Add your control notification handler code here
-    if (image_src.data == NULL)
-        return;
-    // process
-    //cvtColor(image_src, image_dst, CV_BGR2GRAY);
-    Canny(image_src, image_dst, 20,30);
     // get HDC
     CDC* pDC = GetDlgItem(IDC_IMAGEDST)->GetDC(); // 获得显示控件的 DC
     HDC hDC = pDC ->GetSafeHdc();                 // 获取HDC(设备句柄)进行绘图操作
-    // get rect
-    CRect rect;
-    GetDlgItem(IDC_IMAGEDST)->GetClientRect(&rect);
     // MAT TO IplImage
     IplImage img = IplImage(image_dst);
     // IplImage TO CvvImage
     CvvImage cimg;
     cimg.CopyOf(&img);                          // 复制图片
-    cimg.DrawToHDC(hDC, &rect);                 // 将图片绘制到显示控件的指定区域
+    cimg.DrawToHDC(hDC, &rect_image_dst);       // 将图片绘制到显示控件的指定区域
     // release CDC
-    ReleaseDC( pDC );
+    ReleaseDC(pDC);
+}
+
+
+void CHandGestureRecognitionSystemDlg::ProcessImage(void)
+{
+    resize(image_src, image_src, Size(image_width, image_height));
+    Canny(image_src, image_dst, 5,5);
+}
+
+
+bool CHandGestureRecognitionSystemDlg::GetImageSrc(void)
+{
+    if(!videocapture.isOpened())   // check if succeeded
+        return false;
+    videocapture >> image_src;
+    if (image_src.data == NULL)
+        return false;
+    else
+        return true;
 }

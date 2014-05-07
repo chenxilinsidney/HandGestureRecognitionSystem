@@ -6,3 +6,4 @@
 *.log
 *.ipch
 Temp/
+ipch/

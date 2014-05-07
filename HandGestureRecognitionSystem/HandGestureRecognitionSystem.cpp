@@ -6,11 +6,6 @@
 #include "HandGestureRecognitionSystem.h"
 #include "HandGestureRecognitionSystemDlg.h"
 
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
-
-
 // CHandGestureRecognitionSystemApp
 
 BEGIN_MESSAGE_MAP(CHandGestureRecognitionSystemApp, CWinApp)
