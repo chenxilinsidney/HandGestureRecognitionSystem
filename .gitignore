@@ -5,15 +5,4 @@
 *.obj
 *.log
 *.ipch
-# Compiled Dynamic libraries
-*.so
-*.dylib
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-
-# Executables
-*.out
-*.app
+Temp/
