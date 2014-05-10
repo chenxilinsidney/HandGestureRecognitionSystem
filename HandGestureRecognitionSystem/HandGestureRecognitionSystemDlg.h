@@ -10,25 +10,25 @@ class CHandGestureRecognitionSystemDlg : public CDialogEx
 {
 // Construction
 public:
-	CHandGestureRecognitionSystemDlg(CWnd* pParent = NULL);	// standard constructor
+    CHandGestureRecognitionSystemDlg(CWnd* pParent = NULL);	// standard constructor
 
 // Dialog Data
-	enum { IDD = IDD_HANDGESTURERECOGNITIONSYSTEM_DIALOG };
+    enum { IDD = IDD_HANDGESTURERECOGNITIONSYSTEM_DIALOG };
 
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
+    protected:
+    virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV support
 
 
 // Implementation
 protected:
-	HICON m_hIcon;
+    HICON m_hIcon;
 
-	// Generated message map functions
-	virtual BOOL OnInitDialog();
-	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-	afx_msg void OnPaint();
-	afx_msg HCURSOR OnQueryDragIcon();
-	DECLARE_MESSAGE_MAP()
+    // Generated message map functions
+    virtual BOOL OnInitDialog();
+    afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+    afx_msg void OnPaint();
+    afx_msg HCURSOR OnQueryDragIcon();
+    DECLARE_MESSAGE_MAP()
 public:
     afx_msg void OnClickedButtonPlayCamera();
     afx_msg void OnClickedButtonStopCamera();
@@ -37,6 +37,7 @@ private:
     VideoCapture videocapture;
     // image
     Mat image_camera;
+    Mat image_preprocess;
     Mat image_segment;
     Mat image_feature;
     Mat image_recognition;
@@ -62,6 +63,7 @@ public:
 private:
     bool InitCameraAndImage(void);
     void GetBackgroundImage(void);
+    Mat& Preprocess(const Mat& image_input, Mat& image_output);
     Mat& HandSegment(const Mat& image_input, Mat& image_output);
     Mat& FeatureDetect(const Mat& image_input, Mat& image_output);
     Mat& Recognition(const Mat& image_input, Mat& image_output);
@@ -69,4 +71,5 @@ private:
     void PlayImage(Mat& image, int ID, CRect& rect);
 public:
     afx_msg void OnClickedClose();
+    afx_msg void OnClickedButtonRefreshBackground();
 };
