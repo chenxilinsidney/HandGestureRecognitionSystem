@@ -22,6 +22,7 @@ CHandGestureRecognitionSystemDlg::CHandGestureRecognitionSystemDlg(CWnd* pParent
     , point_end(image_width / 2, image_height / 2)
     , vector_angle(0)
     , vector_length(0)
+    , vector_threshold(30)
 {
     m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
     videocapture = VideoCapture(0);
@@ -291,6 +292,7 @@ bool CHandGestureRecognitionSystemDlg::InitCameraAndImage(void)
         return false;
     }
     videocapture >> image_camera;
+    flip(image_camera, image_camera, 1);
     if (image_camera.data == NULL) {
         AfxMessageBox("CAN NOT TRANS CAMERA IMAGE!");
         return false;
@@ -446,7 +448,7 @@ Mat& CHandGestureRecognitionSystemDlg::FeatureDetect(const Mat& image_input, Mat
         point_begin = point_end;
     }
 #ifdef _DEBUG
-    TRACE("vector_length = %d\n", vector_length);
+    TRACE("vector_length = %f\n", vector_length);
     TRACE("vector_angle = %f\n", vector_angle);
 #endif
     return image_output;
@@ -466,7 +468,7 @@ Mat& CHandGestureRecognitionSystemDlg::Recognition(const Mat& image_input, Mat& 
     // draw a line
     line(image_output, point_begin, point_end, CV_RGB(255, 0, 0), 5);
     // put text
-    if (vector_length > 20) {
+    if (vector_length > vector_threshold) {
         std::string text = std::string("direction");
         if (vector_angle >= 45 && vector_angle <= 135) {
             text = std::string("up");

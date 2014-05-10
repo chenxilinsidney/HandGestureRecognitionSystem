@@ -56,6 +56,7 @@ private:
     Point point_end;
     double vector_angle;
     double vector_length;
+    double vector_threshold;
 public:
     afx_msg void OnTimer(UINT_PTR nIDEvent);
     void StartTimer(void);
