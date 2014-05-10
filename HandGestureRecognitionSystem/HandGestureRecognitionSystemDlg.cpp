@@ -125,7 +125,7 @@ void CHandGestureRecognitionSystemDlg::OnPaint()
     MoveWindow(image_interval,
         image_interval,
         image_width * 2 + 4 * image_interval,
-        image_height * 2 + 20 * image_interval);
+        image_height * 2 + 11 * image_interval);
     GetDlgItem(IDC_STATIC_CAMERA)->MoveWindow(
         image_interval * 1 + (image_width - static_width) / 2,
         image_interval * 1,
@@ -186,7 +186,7 @@ void CHandGestureRecognitionSystemDlg::OnPaint()
         image_interval * 5,
         image_interval);
     GetDlgItem(ID_CLOSE)->MoveWindow(
-        image_interval * 22,
+        image_interval * 28,
         image_interval * 7 + image_height * 2,
         image_interval * 5,
         image_interval);
